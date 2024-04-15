@@ -1,0 +1,98 @@
+<%- include('layouts/header') -%>
+
+    <div class="max-w-6xl mx-auto px-4">
+        <form id="postArticle" class="py-4 px-8">
+
+            <div class="hidden error bg-red-700 text-white rounded-md p-3"></div>
+            <div class="hidden success bg-green-500 text-white rounded-md p-3"></div>
+
+            <div class="mb-4">
+                <label class="block text-grey-darker text-sm font-bold mb-2" for="heading">Heading *</label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="heading" type="text"
+                    placeholder="">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-grey-darker text-sm font-bold mb-2" for="subHeading">Sub Heading</label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="subHeading"
+                    type="text" placeholder="">
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-grey-darker text-sm font-bold mb-2" for="content">Content *</label>
+                <textarea rows="10" class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                    id="content" placeholder=""></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-grey-darker text-sm font-bold mb-2" for="coverImage">Cover
+                    Picture
+                    (Optional)</label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="coverImage"
+                    type="file" accept="image/*">
+            </div>
+            <div class="flex items-center justify-between mt-8">
+                <button class="border bg-blue hover:bg-black-200 py-2 px-4 rounded-md" type="submit">
+                    Submit
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.querySelector('#postArticle')
+
+        const heading = document.querySelector('#heading')
+        const subHeading = document.querySelector('#subHeading')
+        const content = document.querySelector('#content')
+        const coverImage = document.querySelector('#coverImage')
+
+        const displayError = document.querySelector('.error')
+        const displaySuccess = document.querySelector('.success')
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log("Submit...")
+
+            displayError.textContent = '';
+            displaySuccess.textContent = '';
+
+            try {
+                const formData = new FormData();
+                formData.append('heading', heading.value);
+                formData.append('subHeading', subHeading.value);
+                formData.append('content', content.value);
+
+                if (coverImage.files.length > 0) {
+                    formData.append('coverImage', coverImage.files[0]);
+                }
+
+                const res = await fetch('/api/article', {
+                    method: 'POST',
+                    body: formData
+                })
+                const data = await res.json()
+                if (res.status === 400 || res.status === 401) {
+                    displayError.classList.remove('hidden');
+                    displayError.textContent = `${data.message}. ${data.error ? data.error : ''}`;
+                    setTimeout(() => {
+                        displayError.classList.add('hidden');
+                    }, 5000);
+                    return;
+                }
+
+                location.assign('/')
+            } catch (err) {
+                console.error("Error: ", err)
+
+                displayError.classList.remove('hidden');
+                displayError.textContent = `${err.message}`;
+                setTimeout(() => {
+                    displayError.classList.add('hidden');
+                }, 5000);
+            }
+
+        })
+    </script>
+
+    <%- include('layouts/footer') -%>

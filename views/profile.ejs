@@ -1,0 +1,137 @@
+<%- include('layouts/header') -%>
+
+<div class="max-w-6xl mx-auto px-4">
+    <form id="profile" class="py-4 px-8">
+
+        <div class="hidden error bg-red-700 text-white rounded-md p-3"></div>
+        <div class="hidden success bg-green-500 text-white rounded-md p-3"></div>
+
+        <div class="flex mb-4">
+            <div class="w-1/2 mr-1">
+                <label class="block text-grey-darker text-sm font-bold mb-2" for="firstName">First
+                    Name</label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                    id="firstName" type="text" value="<%= profile.firstName %>">
+            </div>
+            <div class="w-1/2 ml-1">
+                <label class="block text-grey-darker text-sm font-bold mb-2" for="lastName">Last
+                    Name</label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                    id="lastName" type="text" value="<%= profile.lastName %>">
+            </div>
+        </div>
+        <div class="mb-4">
+            <label class="block text-grey-darker text-sm font-bold mb-2" for="email">Email Address *</label>
+            <input disabled class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="email"
+                type="email" value="<%= profile.email %>">
+        </div>
+        
+        <div class="flex mb-4">
+            <div class="w-1/2 mr-1">
+                <label class="block text-grey-darker text-sm font-bold mb-2" for="newPassword">New Password</label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                    id="newPassword" type="password">
+            </div>
+            <div class="w-1/2 ml-1">
+                <label class="block text-grey-darker text-sm font-bold mb-2" for="confirmPassword">Confirm Password</label>
+                <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                    id="confirmPassword" type="password">
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-grey-darker text-sm font-bold mb-2" for="profilePicture">Profile
+                Picture
+                (Optional)</label>
+            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                id="profilePicture" type="file" accept="image/*">
+        </div>
+        <div class="flex items-center justify-between mt-8">
+            <button class="border bg-blue hover:bg-black-200 py-2 px-4 rounded-md"
+                type="submit">
+                Update
+            </button>
+            <button onclick="deleteAccount()" class="text-white border bg-red-500 hover:bg-red-300 py-2 px-4 rounded-md"
+                type="button">
+                Delete Account
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const form = document.querySelector('#profile')
+
+    const firstName = document.querySelector('#firstName')
+    const lastName = document.querySelector('#lastName')
+    const email = document.querySelector('#email')
+    const password = document.querySelector('#newPassword')
+    const confirmPassword = document.querySelector('#confirmPassword')
+    const profilePicture = document.querySelector('#profilePicture')
+
+    const displayError = document.querySelector('.error')
+    const displaySuccess = document.querySelector('.success')
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault()
+
+        displayError.textContent = '';
+        displaySuccess.textContent = '';
+
+        try {
+            const formData = new FormData();
+            formData.append('firstName', firstName.value);
+            formData.append('lastName', lastName.value);
+            formData.append('email', email.value);
+            formData.append('password', password.value);
+            formData.append('confirmPassword', confirmPassword.value);
+
+            if (profilePicture.files.length > 0) {
+                formData.append('profilePicture', profilePicture.files[0]);
+            }
+
+            const res = await fetch('/api/user/update', {
+                method: 'PUT',
+                body: formData
+            })
+            const data = await res.json()
+            if (res.status === 400 || res.status === 401) {
+                displayError.classList.remove('hidden');
+                displayError.textContent = `${data.message}. ${data.error ? data.error : ''}`;
+                setTimeout(() => {
+                    displayError.classList.add('hidden');
+                }, 5000);
+                return;
+            }
+
+            location.assign('/login')
+        } catch (err) {
+            console.error("Error: ", err)
+
+            displayError.classList.remove('hidden');
+            displayError.textContent = `${data.message}. ${data.error ? data.error : ''}`
+            setTimeout(() => {
+                displayError.classList.add('hidden');
+            }, 5000);
+        }
+
+    })
+
+    async function deleteAccount() {
+            const confirmDelete = confirm("Are you sure you want to delete your account? This action cannot be undone");
+
+            if (confirmDelete) {
+                try {
+                    const response = await fetch(`/api/user/delete`, {
+                        method: 'DELETE',
+                    });
+
+                    location.assign('/')
+                } catch (error) {
+                    console.error('Error:', error);
+                }
+            }
+        }
+</script>
+
+<%- include('layouts/footer') -%>

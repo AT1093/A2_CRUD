@@ -1,0 +1,26 @@
+@import url("https://fonts.googleapis.com/css?family=Roboto:300,400,500,700,900&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+p {
+    @apply leading-[1.6];
+}
+
+.dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown button span {
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.dropdown-menu, .dropdown-menu li, .dropdown-menu li form button {
+    width: 100%;
+    text-align: left;
+}
+
+.cover-image {
+    height: 400px;
+}

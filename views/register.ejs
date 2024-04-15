@@ -1,0 +1,116 @@
+<%- include('layouts/header') -%>
+
+    <div class="w-full bg-grey-lightest" style="padding-top: 4rem;">
+        <div class="container mx-auto py-8">
+            <div class="w-5/6 lg:w-1/2 mx-auto bg-white rounded shadow">
+                <div class="py-4 px-8 text-black text-xl border-b border-grey-lighter">Register for a free account</div>
+                <form class="py-4 px-8">
+
+                    <div class="hidden error bg-red-700 text-white rounded-md p-3"></div>
+                    <div class="hidden success bg-green-500 text-white rounded-md p-3"></div>
+
+                    <div class="flex mb-4">
+                        <div class="w-1/2 mr-1">
+                            <label class="block text-grey-darker text-sm font-bold mb-2" for="first_name">First
+                                Name *</label>
+                            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                                id="firstName" type="text" placeholder="Your first name">
+                        </div>
+                        <div class="w-1/2 ml-1">
+                            <label class="block text-grey-darker text-sm font-bold mb-2" for="last_name">Last
+                                Name *</label>
+                            <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                                id="lastName" type="text" placeholder="Your last name">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-grey-darker text-sm font-bold mb-2" for="email">Email Address *</label>
+                        <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="email"
+                            type="email" placeholder="Your email address">
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-grey-darker text-sm font-bold mb-2" for="password">Password *</label>
+                        <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker" id="password"
+                            type="password" placeholder="Your secure password">
+                        <p class="text-grey text-xs mt-1">At least 6 characters</p>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-grey-darker text-sm font-bold mb-2" for="profilePicture">Profile
+                            Picture
+                            (Optional)</label>
+                        <input class="appearance-none border rounded w-full py-2 px-3 text-grey-darker"
+                            id="profilePicture" type="file" accept="image/*">
+                    </div>
+                    <div class="flex items-center justify-between mt-8">
+                        <button class="border bg-blue hover:bg-black-200 py-2 px-4 rounded-md"
+                            type="submit">
+                            Submit
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <p class="text-center my-4">
+                <a href="#" class="text-grey-dark text-sm no-underline hover:text-grey-darker">I already have an
+                    account</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const form = document.querySelector('form')
+
+        const firstName = document.querySelector('#firstName')
+        const lastName = document.querySelector('#lastName')
+        const email = document.querySelector('#email')
+        const password = document.querySelector('#password')
+        const profilePicture = document.querySelector('#profilePicture')
+
+        const displayError = document.querySelector('.error')
+        const displaySuccess = document.querySelector('.success')
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+
+            displayError.textContent = '';
+            displaySuccess.textContent = '';
+
+            try {
+                const formData = new FormData();
+                formData.append('firstName', firstName.value);
+                formData.append('lastName', lastName.value);
+                formData.append('email', email.value);
+                formData.append('password', password.value);
+
+                if (profilePicture.files.length > 0) {
+                    formData.append('profilePicture', profilePicture.files[0]);
+                }
+
+                const res = await fetch('/api/register', {
+                    method: 'POST',
+                    body: formData
+                })
+                const data = await res.json()
+                if (res.status === 400 || res.status === 401) {
+                    displayError.classList.remove('hidden');
+                    displayError.textContent = `${data.message}. ${data.error ? data.error : ''}`;
+                    setTimeout(() => {
+                        displayError.classList.add('hidden');
+                    }, 5000);
+                    return;
+                }
+
+                location.assign('/login')
+            } catch (err) {
+                console.error("Error: ", err)
+
+                displayError.classList.remove('hidden');
+                displayError.textContent = `${data.message}. ${data.error ? data.error : ''}`
+                setTimeout(() => {
+                    displayError.classList.add('hidden');
+                }, 5000);
+            }
+
+        })
+    </script>
+
+    <%- include('layouts/footer') -%>

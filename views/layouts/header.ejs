@@ -1,0 +1,121 @@
+<html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="/css/style.css" rel="stylesheet" type="text/css">
+  <style>
+    body {
+      color: #000;
+      background: #fff;
+    }
+  </style>
+</head>
+
+<body>
+  <nav class="bg-gray-100">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex justify-between">
+
+        <div class="flex space-x-4">
+          <!-- logo -->
+          <div>
+            <a href="/" class="flex items-center py-5 px-2 text-gray-700 hover:text-gray-900">
+              <svg class="h-6 w-6 mr-1 text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              <span class="font-bold">Logo</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- secondary nav -->
+        <div class="hidden md:flex items-center space-x-1">
+          <% if (!profile) { %>
+            <!-- User is not logged in -->
+            <a href="/login" class="py-5 px-3">Login</a>
+            <a href="/register"
+              class="py-2 px-3 bg-green-500 hover:bg-green-300 text-green-900 hover:text-green-800 rounded transition duration-300">Signup</a>
+            <% } else { %>
+              <div>
+                <a href="/post-article" class="py-5 px-3 hover:text-green-500">Post Article</a>
+                <div class="dropdown inline-block relative">
+                  <button class="font-semibold py-2 px-4 rounded flex justify-between">
+                    <span>
+                      <%= profile.firstName + " " + profile.lastName + " " %>
+                    </span>
+                    <% if (profile.profilePicture) { %>
+                      <img src="<%= publicUrl + profile.profilePicture %>" alt="Profile Picture"
+                        class="h-8 w-8 rounded-full object-cover">
+                      <% } else { %>
+                        <img src="/images/avatar.jpg" alt="Profile Picture"
+                      class="h-8 w-8 rounded-full object-cover">
+                        <% } %>
+
+                          <svg style="margin-top: 5px; margin-left: 10px" class="fill-current h-4 w-4"
+                            xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                            <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
+                          </svg>
+                  </button>
+                  <ul class="dropdown-menu absolute hidden text-gray-700 pt-1">
+                    <li class=""><a class="rounded-t bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap"
+                        href="/profile">Profile</a></li>
+                    <li class="">
+                      <form id="logout">
+                        <button type="submit"
+                          class="bg-gray-200 hover:bg-gray-400 py-2 px-4 block whitespace-no-wrap">Logout</button>
+                      </form>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              <% } %>
+        </div>
+
+        <!-- mobile button goes here -->
+        <div class="md:hidden flex items-center">
+          <button class="mobile-menu-button">
+            <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+              stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <% if (profile) { %>
+    <script>
+      const logoutForm = document.querySelector('#logout')
+
+      logoutForm.addEventListener('submit', async (e) => {
+        e.preventDefault()
+
+        try {
+          // Send a POST request to the '/logout' endpoint
+          const response = await fetch('/api/logout', {
+            method: 'POST'
+          });
+
+          if (response.ok) {
+            document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+            localStorage.removeItem('jwt');
+
+            location.assign('/login')
+          } else {
+            console.error('Logout failed:', response);
+          }
+        } catch (err) {
+          console.error('Logout failed:', err);
+        }
+      })
+    </script>
+    <% } %>
