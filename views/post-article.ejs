@@ -39,12 +39,22 @@
         </form>
     </div>
 
+    <script src="https://cdn.tiny.cloud/1/lta64l2g1mevfp7i7mk491qjt6d3aulaia7spxs67nye8voy/tinymce/7/tinymce.min.js"
+        referrerpolicy="origin"></script>
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons image link lists media searchreplace table visualblocks wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | link image media table | align lineheight | numlist bullist indent outdent | emoticons charmap | removeformat',
+        });
+    </script>
+
     <script>
         const form = document.querySelector('#postArticle')
 
         const heading = document.querySelector('#heading')
         const subHeading = document.querySelector('#subHeading')
-        const content = document.querySelector('#content')
+        // const content = document.querySelector('#content')
         const coverImage = document.querySelector('#coverImage')
 
         const displayError = document.querySelector('.error')
@@ -61,7 +71,7 @@
                 const formData = new FormData();
                 formData.append('heading', heading.value);
                 formData.append('subHeading', subHeading.value);
-                formData.append('content', content.value);
+                formData.append('content',  tinymce.get("content").getContent());
 
                 if (coverImage.files.length > 0) {
                     formData.append('coverImage', coverImage.files[0]);
