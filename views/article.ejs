@@ -23,7 +23,6 @@
                                         </a></p>
 
                                     <% if (profile && article.author._id.toString()===profile.id.toString()) { %>
-                                        <!-- If the article's author ID matches the profile ID, render delete and edit buttons -->
                                         <div class="mt-2">
                                             <a href="/edit-article/<%= article._id %>"
                                                 class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">Edit</a>
